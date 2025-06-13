@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis Interactivo de la Deserción Universitaria en Perú</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Academia -->
+    <!-- Application Structure Plan: He diseñado la aplicación como una experiencia de "scrollytelling" de una sola página. Comienza con una visión general impactante (El Panorama), luego se sumerge en las causas multifactoriales (¿Por Qué Abandonan?) utilizando una cuadrícula interactiva para evitar la sobrecarga de información. A continuación, se centra en el aspecto humano y la desigualdad (Los Rostros de la Desigualdad) mediante perfiles de vulnerabilidad para destacar la interseccionalidad. Finalmente, presenta una sección orientada a la acción (Buscando Soluciones) que resume políticas y recomendaciones. Esta estructura guía al usuario desde la comprensión del problema hasta la exploración de sus causas, el impacto en las personas y las posibles soluciones, creando un flujo narrativo lógico y atractivo que es más digerible que el formato lineal del informe original. -->
+    <!-- Visualization & Content Choices: 
+        - Panorama: Goal: Informar sobre la escala y tendencia. Viz: Gráfico de líneas (Chart.js) para mostrar la evolución temporal y un gráfico de barras (Chart.js) para comparar público vs. privado. Interaction: Tooltips al pasar el ratón. Justification: Los gráficos son la forma más eficaz de presentar datos de series temporales y comparaciones directas.
+        - Causas: Goal: Organizar y explorar factores complejos. Viz: Diagrama de cuatro cuadrantes (HTML/CSS/JS) para las dimensiones causales. Dentro de cada una, se utilizan tarjetas de información, gráficos de barras de percepción y un diagrama de ciclo (HTML/CSS) para la salud mental. Interaction: Clic en los cuadrantes para revelar detalles. Justification: Este enfoque de "revelación progresiva" descompone un tema complejo en partes manejables, evitando abrumar al usuario. Se añade una nueva subsección con un diagrama de flujo y un gráfico de barras horizontales para explicar el modelo predictivo de la 'intención de deserción', centrándose en factores psicológicos y docentes.
+        - Desigualdad: Goal: Relacionar y comparar perfiles de vulnerabilidad. Viz: Tarjetas de perfil interactivas (HTML/CSS/JS) y un visualizador de riesgo interseccional. Interaction: Clic en las tarjetas para expandir la información. Justification: Centrarse en "perfiles" humaniza los datos y el concepto de interseccionalidad se demuestra visualmente, lo que es más impactante que el texto solo.
+        - Soluciones: Goal: Informar sobre acciones y recomendaciones. Viz: Listas estructuradas y un sistema de pestañas (HTML/CSS/JS) para las recomendaciones. Interaction: Clic en las pestañas. Justification: Las pestañas organizan las recomendaciones de manera eficiente, permitiendo al usuario centrarse en las dirigidas al gobierno o a las universidades.
+        - Library/Method: Chart.js (Canvas) para todos los gráficos. Interacciones personalizadas con Vanilla JS. Estructura con Tailwind CSS. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F5F2;
+            color: #334155;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #E17C60;
+            border-bottom-color: #E17C60;
+        }
+        .factor-card {
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+        }
+        .factor-card.active {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .tab-button.active {
+            background-color: #E17C60;
+            color: #FFFFFF;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="font-extrabold text-xl text-[#E17C60]">🎓 Deserción Perú</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#panorama" class="nav-link px-3 py-2 rounded-md text-sm font-medium">El Panorama</a>
+                        <a href="#causas" class="nav-link px-3 py-2 rounded-md text-sm font-medium">¿Por Qué Abandonan?</a>
+                        <a href="#desigualdad" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Los Rostros de la Desigualdad</a>
+                        <a href="#soluciones" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Buscando Soluciones</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero" class="py-20 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-slate-800">La Lucha por un Sueño Universitario en Perú</h1>
+                <p class="mt-6 max-w-3xl mx-auto text-lg text-slate-600">Un análisis interactivo de un problema complejo. En universidades privadas, el <span class="font-bold text-[#E17C60]">27% de los estudiantes</span> abandona su carrera en el primer año. Explora los datos, las causas y las posibles soluciones detrás de esta y otras cifras alarmantes.</p>
+            </div>
+        </section>
+
+        <section id="panorama" class="py-16 md:py-24">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-slate-800">El Panorama General</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-md text-slate-500">La deserción estudiantil es un fenómeno dinámico. Las tasas nacionales revelan el profundo impacto de la crisis de la COVID-19 y la subsiguiente recuperación, aunque con marcadas diferencias entre los tipos de universidades.</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
+                    <div class="bg-white p-6 rounded-xl shadow-md">
+                        <h3 class="text-xl font-bold text-center mb-4">Evolución de la Tasa de Interrupción Nacional</h3>
+                        <div class="chart-container">
+                            <canvas id="dropoutRateChart"></canvas>
+                        </div>
+                        <p class="text-xs text-center mt-2 text-slate-500">Fuente: MINEDU/SUNEDU. *Tasa 2019-2 inferida.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md">
+                        <h3 class="text-xl font-bold text-center mb-4">Interrupción por Tipo de Gestión Universitaria (Pandemia)</h3>
+                        <div class="chart-container">
+                            <canvas id="uniTypeChart"></canvas>
+                        </div>
+                        <p class="text-xs text-center mt-2 text-slate-500">Fuente: MINEDU/SUNEDU.</p>
+                    </div>
+                </div>
+                <div class="mt-12 bg-amber-100 border-l-4 border-amber-500 text-amber-800 p-4 rounded-r-lg max-w-4xl mx-auto">
+                    <p class="font-bold">Una "Ilusión de Recuperación"</p>
+                    <p class="text-sm">La notable caída de la deserción al 11.5% en 2021, un mínimo histórico, no refleja una solución a las causas estructurales. Fue el resultado de un masivo, pero temporal, paquete de emergencia de S/ 520 millones. Retirado este "soporte vital", es probable que las tasas vuelvan a subir si no se abordan los problemas de fondo.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="causas" class="py-16 md:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-slate-800">Un Vistazo Profundo a las Causas</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-md text-slate-500">La deserción rara vez tiene una sola causa. A continuación, exploramos tanto las dimensiones estructurales como un modelo predictivo que nos permite identificar las señales de alerta temprana.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div id="btn-socioeconomic" class="factor-card bg-rose-100 text-rose-800 p-6 rounded-lg text-center active">
+                        <span class="text-4xl">💸</span>
+                        <h3 class="mt-2 font-bold text-lg">Socioeconómico</h3>
+                    </div>
+                    <div id="btn-academic" class="factor-card bg-sky-100 text-sky-800 p-6 rounded-lg text-center">
+                        <span class="text-4xl">📚</span>
+                        <h3 class="mt-2 font-bold text-lg">Académico-Vocacional</h3>
+                    </div>
+                    <div id="btn-institutional" class="factor-card bg-teal-100 text-teal-800 p-6 rounded-lg text-center">
+                        <span class="text-4xl">🏢</span>
+                        <h3 class="mt-2 font-bold text-lg">Institucional</h3>
+                    </div>
+                    <div id="btn-psychosocial" class="factor-card bg-violet-100 text-violet-800 p-6 rounded-lg text-center">
+                        <span class="text-4xl">🧠</span>
+                        <h3 class="mt-2 font-bold text-lg">Psicosocial y Salud Mental</h3>
+                    </div>
+                </div>
+                
+                <div id="content-socioeconomic" class="content-section active p-6 bg-rose-50 rounded-lg">
+                    <h3 class="font-bold text-2xl text-rose-900 mb-4">El Peso de la Economía</h3>
+                    <p class="text-rose-800 mb-6">La vulnerabilidad económica es el predictor más fuerte de la deserción. La necesidad de trabajar y la falta de recursos familiares crean una presión insostenible para muchos estudiantes.</p>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-bold text-rose-900">Calculadora de Riesgo (Probabilidad de interrupción)</h4>
+                            <div class="mt-4 space-y-3">
+                                <label class="flex items-center">
+                                    <input type="checkbox" data-risk="8" data-gender="male" class="risk-checkbox h-4 w-4 rounded border-gray-300 text-[#E17C60] focus:ring-[#E17C60]">
+                                    <span class="ml-2 text-sm text-rose-800">Hombre, hogar más pobre</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" data-risk="4" data-gender="female" class="risk-checkbox h-4 w-4 rounded border-gray-300 text-[#E17C60] focus:ring-[#E17C60]">
+                                    <span class="ml-2 text-sm text-rose-800">Mujer, hogar más pobre</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" data-risk="1.25" class="risk-checkbox h-4 w-4 rounded border-gray-300 text-[#E17C60] focus:ring-[#E17C60]">
+                                    <span class="ml-2 text-sm text-rose-800">Padres sin educación superior</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" data-risk="1.58" class="risk-checkbox h-4 w-4 rounded border-gray-300 text-[#E17C60] focus:ring-[#E17C60]">
+                                    <span class="ml-2 text-sm text-rose-800">Con dependiente en el hogar</span>
+                                </label>
+                            </div>
+                            <div class="mt-4 bg-rose-200 p-4 rounded">
+                                <p class="text-rose-900">El riesgo de deserción es <span id="risk-factor" class="font-extrabold text-2xl">1x</span> mayor que el promedio.</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-inner">
+                            <p class="font-bold text-rose-900">Voz del Estudiante:</p>
+                            <blockquote class="mt-2 text-sm italic text-slate-600 border-l-4 border-rose-300 pl-4">
+                                "Tuve que dejar mis estudios para trabajar en una agroexportadora en Piura... mi horario era de 4:30 a.m. a 5:00 p.m. Era imposible."
+                                <cite class="block not-italic mt-2 text-xs">— Maribel, ex-estudiante.</cite>
+                            </blockquote>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="content-academic" class="content-section p-6 bg-sky-50 rounded-lg">
+                    <h3 class="font-bold text-2xl text-sky-900 mb-4">El Desajuste entre Expectativas y Realidad</h3>
+                     <p class="text-sky-800 mb-6">Una preparación secundaria deficiente y una elección de carrera equivocada son causas fundamentales de frustración y abandono, especialmente en los primeros ciclos.</p>
+                     <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-white p-4 rounded-lg shadow-inner">
+                            <p class="font-bold text-sky-900">Voz del Estudiante:</p>
+                            <blockquote class="mt-2 text-sm italic text-slate-600 border-l-4 border-sky-300 pl-4">
+                                "Dejé Medicina porque no me gustaban los cursos ni el ambiente. El problema fue la falta de investigación previa sobre la carrera."
+                                <cite class="block not-italic mt-2 text-xs">— Giorgio, ex-estudiante.</cite>
+                            </blockquote>
+                        </div>
+                        <div>
+                             <h4 class="font-bold text-sky-900 mb-2">Percepción Estudiantil sobre Causas Académicas/Vocacionales</h4>
+                            <div class="space-y-2 text-sm">
+                                <div class="w-full bg-sky-200 rounded-full h-6">
+                                    <div class="bg-sky-500 h-6 rounded-full flex items-center justify-between px-2" style="width: 86.8%">
+                                        <span class="text-white font-medium">86.8%</span>
+                                    </div>
+                                </div>
+                                <p class="text-sky-700">Cree que la <span class="font-semibold">falta de información</span> de las universidades es un factor.</p>
+
+                                <div class="w-full bg-sky-200 rounded-full h-6 mt-4">
+                                    <div class="bg-sky-500 h-6 rounded-full flex items-center justify-between px-2" style="width: 74.8%">
+                                        <span class="text-white font-medium">74.8%</span>
+                                    </div>
+                                </div>
+                                 <p class="text-sky-700">Considera la <span class="font-semibold">deficiente orientación vocacional</span> en el colegio como causa.</p>
+                                
+                                <div class="w-full bg-sky-200 rounded-full h-6 mt-4">
+                                    <div class="bg-sky-500 h-6 rounded-full flex items-center justify-between px-2" style="width: 74.7%">
+                                        <span class="text-white font-medium">74.7%</span>
+                                    </div>
+                                </div>
+                                <p class="text-sky-700">Señala el <span class="font-semibold">bajo nivel de los estudios secundarios</span>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="content-institutional" class="content-section p-6 bg-teal-50 rounded-lg">
+                    <h3 class="font-bold text-2xl text-teal-900 mb-4">El Rol de la Universidad</h3>
+                    <p class="text-teal-800 mb-6">La calidad de la enseñanza y la falta de sistemas de apoyo (tutorías, consejería) son cruciales. Un entorno que no fomenta la pertenencia contribuye a que los estudiantes se sientan aislados y abandonen.</p>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="bg-white p-4 rounded-lg shadow-inner">
+                           <h4 class="font-bold text-teal-900">Desacuerdo con la Enseñanza</h4>
+                           <p class="text-5xl font-extrabold text-teal-500 mt-2">36.2%</p>
+                           <p class="text-xs text-slate-500 mt-1">De los estudiantes de una escuela de medicina desertaron por este motivo.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-inner">
+                           <h4 class="font-bold text-teal-900">Falta de Apoyo Docente/Tutor</h4>
+                           <p class="text-5xl font-extrabold text-teal-500 mt-2">26.1%</p>
+                           <p class="text-xs text-slate-500 mt-1">Principal causa institucional de deserción en una universidad intercultural.</p>
+                        </div>
+                         <div class="bg-white p-4 rounded-lg shadow-inner">
+                           <h4 class="font-bold text-teal-900">Percepción de Autoritarismo</h4>
+                           <p class="text-5xl font-extrabold text-teal-500 mt-2">45.6%</p>
+                           <p class="text-xs text-slate-500 mt-1">De estudiantes encuestados lo considera una causa de deserción.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="content-psychosocial" class="content-section p-6 bg-violet-50 rounded-lg">
+                     <h3 class="font-bold text-2xl text-violet-900 mb-4">Salud Mental: La Causa Silenciosa</h3>
+                     <p class="text-violet-800 mb-6">La alta prevalencia de estrés, ansiedad y depresión es un factor crítico. Los problemas de salud mental y el bajo rendimiento académico a menudo se retroalimentan en un ciclo vicioso que culmina en la deserción.</p>
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <h4 class="font-bold text-violet-900 mb-2">Prevalencia de problemas de salud mental en estudiantes</h4>
+                            <div class="chart-container h-64 md:h-80">
+                                <canvas id="mentalHealthChart"></canvas>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-violet-900 mb-2">El Ciclo Vicioso de la Deserción</h4>
+                            <div class="space-y-4 mt-4">
+                                <div class="flex items-center">
+                                    <div class="bg-violet-200 text-violet-800 font-bold p-3 rounded-lg shadow">1. Presión Académica y Económica</div>
+                                </div>
+                                <div class="flex justify-center"><span class="text-2xl text-violet-400">⬇️</span></div>
+                                <div class="flex items-center">
+                                    <div class="bg-violet-300 text-violet-900 font-bold p-3 rounded-lg shadow">2. Estrés, Ansiedad, Depresión</div>
+                                </div>
+                                <div class="flex justify-center"><span class="text-2xl text-violet-400">⬇️</span></div>
+                                <div class="flex items-center">
+                                    <div class="bg-violet-200 text-violet-800 font-bold p-3 rounded-lg shadow">3. Bajo Rendimiento Académico</div>
+                                </div>
+                                <div class="flex justify-center"><span class="text-2xl text-violet-400">⬇️</span></div>
+                                <div class="flex items-center">
+                                    <div class="bg-violet-300 text-violet-900 font-bold p-3 rounded-lg shadow">4. Se refuerza el Estrés y la Ansiedad</div>
+                                </div>
+                                <div class="flex justify-center"><span class="text-2xl text-red-500">➡️</span></div>
+                                 <div class="flex items-center">
+                                    <div class="bg-red-200 text-red-800 font-bold p-3 rounded-lg shadow">5. Deserción</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-12 pt-12 border-t border-slate-200">
+                    <div class="text-center mb-12">
+                         <h3 class="text-2xl md:text-3xl font-bold tracking-tight text-slate-800">El Modelo Predictivo: De la Intención al Abandono</h3>
+                         <p class="mt-4 max-w-2xl mx-auto text-md text-slate-500">Antes de que un estudiante abandone, suele haber señales de alerta. La "intención de deserción" es un predictor clave. La investigación en universidades de Lima revela cómo ciertos factores psicológicos y docentes influyen en esta intención.</p>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
+                        <div class="bg-white p-6 rounded-xl shadow-md">
+                            <h4 class="text-xl font-bold text-center mb-4">Factores con Mayor Correlación a la Intención de Deserción</h4>
+                             <div class="chart-container" style="height: 350px;">
+                                <canvas id="intentionFactorsChart"></canvas>
+                            </div>
+                            <p class="text-xs text-center mt-2 text-slate-500">Fuente: Respondek et al. (2017). Datos de estudio en Alemania utilizados como marco de referencia en investigación peruana.</p>
+                        </div>
+                        <div class="bg-slate-50 p-6 rounded-xl">
+                            <h4 class="font-bold text-lg text-slate-800 mb-4">El Camino Hacia la Intención de Desertar</h4>
+                            <ul class="space-y-4">
+                                <li class="flex items-start">
+                                    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-sky-500 text-white font-bold text-sm mr-3 mt-1">1</span>
+                                    <div>
+                                        <h5 class="font-semibold">Control y Docencia</h5>
+                                        <p class="text-sm text-slate-600">Un bajo <span class="font-bold">Control Académico Percibido</span> (sentir que no se tiene influencia en los resultados) y un pobre <span class="font-bold">Liderazgo y Desempeño Docente</span> actúan como el punto de partida.</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start">
+                                     <span class="flex h-6 w-6 items-center justify-center rounded-full bg-violet-500 text-white font-bold text-sm mr-3 mt-1">2</span>
+                                    <div>
+                                        <h5 class="font-semibold">Emergencia de Emociones Negativas</h5>
+                                        <p class="text-sm text-slate-600">Esta falta de control y mal soporte docente alimentan emociones académicas negativas, principalmente la <span class="font-bold">Ansiedad</span> y el <span class="font-bold">Aburrimiento</span>.</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start">
+                                     <span class="flex h-6 w-6 items-center justify-center rounded-full bg-rose-500 text-white font-bold text-sm mr-3 mt-1">3</span>
+                                    <div>
+                                        <h5 class="font-semibold">Aparece la Intención de Deserción</h5>
+                                        <p class="text-sm text-slate-600">La ansiedad es el predictor emocional más fuerte. A mayor ansiedad, mayor es la probabilidad de que el estudiante considere seriamente abandonar sus estudios, cambiar de carrera o dejar la universidad.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                             <div class="mt-6 bg-green-100 border-l-4 border-green-500 text-green-800 p-4 rounded-r-lg">
+                                <p class="font-bold text-sm">Hallazgo Clave del Estudio en Lima:</p>
+                                <p class="text-xs mt-1">El estudio de Veliz Palomino (2023) confirma para el contexto peruano que tanto un mayor <span class="font-semibold">control académico percibido</span> como un mejor <span class="font-semibold">desempeño y liderazgo docente</span> disminuyen significativamente la intención de deserción.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="desigualdad" class="py-16 md:py-24">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-slate-800">Los Rostros de la Desigualdad</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-md text-slate-500">La deserción no afecta a todos por igual. Refleja y amplifica las desigualdades estructurales. La vulnerabilidad se multiplica cuando se cruzan ejes de desigualdad como género, etnia, lugar de origen y clase social.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <p class="text-3xl">👩</p>
+                        <h4 class="font-bold mt-2">Género</h4>
+                        <p class="text-sm mt-1 text-slate-600">Las mujeres, especialmente las de lengua materna nativa, tienen <span class="font-bold text-[#E17C60]">3 veces más probabilidades</span> de desertar.</p>
+                    </div>
+                     <div class="bg-white p-6 rounded-lg shadow-md">
+                        <p class="text-3xl">🗣️</p>
+                        <h4 class="font-bold mt-2">Etnia y Lengua</h4>
+                        <p class="text-sm mt-1 text-slate-600">Pertenecer a un pueblo indígena y no ser hispanohablante es un factor de riesgo significativo por barreras académicas y discriminación.</p>
+                    </div>
+                     <div class="bg-white p-6 rounded-lg shadow-md">
+                        <p class="text-3xl">🏞️</p>
+                        <h4 class="font-bold mt-2">Brecha Urbano-Rural</h4>
+                        <p class="text-sm mt-1 text-slate-600">Solo el <span class="font-bold text-[#E17C60]">8.1% de los jóvenes rurales</span> accede a la universidad, enfrentando una severa "pobreza digital".</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <p class="text-3xl">💰</p>
+                        <h4 class="font-bold mt-2">Clase Social</h4>
+                        <p class="text-sm mt-1 text-slate-600">Los jóvenes de hogares pobres tienen hasta <span class="font-bold text-[#E17C60]">8 veces más probabilidades</span> de interrumpir sus estudios.</p>
+                    </div>
+                </div>
+                <div class="mt-12 bg-indigo-100 border-l-4 border-indigo-500 text-indigo-800 p-6 rounded-r-lg max-w-4xl mx-auto">
+                    <p class="font-bold text-lg">La Interseccionalidad: Donde los Riesgos se Multiplican</p>
+                    <p class="text-sm mt-2">El perfil de mayor riesgo no es simplemente "pobre" o "mujer" o "indígena". Es la <span class="font-semibold">mujer indígena de una zona rural pobre</span>. Para ella, las barreras económicas, geográficas, lingüísticas y culturales se refuerzan mutuamente, haciendo casi imposible la permanencia sin un apoyo integral y focalizado. Las políticas de "talla única" fracasan aquí.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="soluciones" class="py-16 md:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-slate-800">Buscando Soluciones</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-md text-slate-500">Combatir la deserción requiere un enfoque coordinado. A continuación se evalúan las principales políticas y se presentan recomendaciones clave para el gobierno y las universidades.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <article>
+                        <h3 class="font-bold text-2xl mb-4">Evaluación de Políticas: El Caso de Beca 18</h3>
+                        <div class="bg-slate-50 p-6 rounded-lg">
+                            <p class="mb-4">Beca 18 es la política estatal más importante para el acceso, pero su impacto en la permanencia es más complejo.</p>
+                            <div class="space-y-4">
+                                <div>
+                                    <h4 class="font-semibold text-green-700">✅ Éxitos (Acceso)</h4>
+                                    <ul class="list-disc list-inside text-sm text-slate-600 mt-2 space-y-1">
+                                        <li>Aumenta la probabilidad de matrícula en <span class="font-bold">+58 p.p.</span></li>
+                                        <li>Promueve el inicio oportuno de estudios en <span class="font-bold">+81 p.p.</span></li>
+                                        <li>Efectiva para reducir la brecha de acceso urbano-rural.</li>
+                                    </ul>
+                                </div>
+                                 <div>
+                                    <h4 class="font-semibold text-red-700">❌ Desafíos (Permanencia)</h4>
+                                    <ul class="list-disc list-inside text-sm text-slate-600 mt-2 space-y-1">
+                                        <li>El apoyo financiero por sí solo no es suficiente.</li>
+                                        <li>El principal motivo de pérdida de la beca es el <span class="font-bold">bajo rendimiento académico</span>.</li>
+                                        <li>Se necesita evolucionar de un programa de financiamiento a uno de <span class="font-bold">apoyo integral</span> (tutoría, salud mental).</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                    
+                    <article>
+                        <h3 class="font-bold text-2xl mb-4">Recomendaciones Estratégicas</h3>
+                        <div class="bg-slate-50 p-6 rounded-lg">
+                             <div class="mb-4">
+                                <div class="flex border border-gray-200 rounded-lg">
+                                    <button id="btn-gov" class="tab-button w-1/2 p-2 font-semibold text-sm active">Para el Gobierno</button>
+                                    <button id="btn-uni" class="tab-button w-1/2 p-2 font-semibold text-sm">Para las Universidades</button>
+                                </div>
+                            </div>
+                            <div id="content-gov" class="content-section active">
+                                <ul class="list-disc list-inside space-y-3 text-slate-700 text-sm">
+                                    <li><span class="font-semibold">Política Nacional de Permanencia:</span> Diseñar y financiar una política con metas claras.</li>
+                                    <li><span class="font-semibold">Evolucionar Beca 18:</span> Integrar apoyo académico y de salud mental obligatorios.</li>
+                                    <li><span class="font-semibold">Articulación Educativa:</span> Fortalecer la orientación vocacional y nivelación desde la secundaria.</li>
+                                    <li><span class="font-semibold">Invertir en Conectividad:</span> Mantener la inversión para cerrar la brecha digital.</li>
+                                </ul>
+                            </div>
+                             <div id="content-uni" class="content-section">
+                                 <ul class="list-disc list-inside space-y-3 text-slate-700 text-sm">
+                                    <li><span class="font-semibold">Sistemas de Alerta Temprana:</span> Usar datos para identificar estudiantes en riesgo de forma proactiva.</li>
+                                    <li><span class="font-semibold">Apoyo Integral:</span> Integrar servicios de tutoría y apoyo psicológico.</li>
+                                    <li><span class="font-semibold">Fomentar la Comunidad:</span> Crear sentido de pertenencia a través de mentorías y actividades.</li>
+                                    <li><span class="font-semibold">Capacitación Docente:</span> Formar a los profesores para identificar y derivar a estudiantes con dificultades.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-slate-800 text-white mt-16">
+        <div class="container mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-sm">
+            <p>&copy; 2024 Análisis Interactivo de la Deserción Universitaria en Perú.</p>
+            <p class="text-slate-400 mt-1">Visualización de datos basada en el informe "La Deserción Universitaria en el Perú: Un Análisis Multidimensional".</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const FgColor = '#334155';
+            const BgColorRose = 'rgba(254, 226, 226, 0.5)';
+            const BorderColorRose = 'rgb(254, 205, 211)';
+            const BgColorSky = 'rgba(224, 242, 254, 0.5)';
+            const BorderColorSky = 'rgb(186, 230, 253)';
+            const PrimaryColor = '#E17C60';
+            const SecondaryColor = '#60A5FA';
+            
+            function wrapText(context, text, x, y, maxWidth, lineHeight) {
+                const words = text.split(' ');
+                let line = '';
+                for (let n = 0; n < words.length; n++) {
+                    let testLine = line + words[n] + ' ';
+                    let metrics = context.measureText(testLine);
+                    let testWidth = metrics.width;
+                    if (testWidth > maxWidth && n > 0) {
+                        context.fillText(line, x, y);
+                        line = words[n] + ' ';
+                        y += lineHeight;
+                    } else {
+                        line = testLine;
+                    }
+                }
+                context.fillText(line, x, y);
+            }
+
+            const chartOptions = {
+                maintainAspectRatio: false,
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: 'rgba(0,0,0,0.7)',
+                        titleFont: {
+                            size: 14,
+                            family: "'Inter', sans-serif",
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 12,
+                            family: "'Inter', sans-serif"
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: FgColor,
+                             callback: function(value) {
+                                return value + '%';
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0,0,0,0.05)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: FgColor
+                        },
+                         grid: {
+                            display: false
+                        }
+                    }
+                }
+            };
+            
+            const dropoutData = {
+                labels: ['2019-2*', '2020-1', '2020-2', '2021-1'],
+                datasets: [{
+                    label: 'Tasa de Interrupción Nacional (%)',
+                    data: [14.5, 18.3, 16.2, 11.5],
+                    fill: true,
+                    borderColor: PrimaryColor,
+                    backgroundColor: 'rgba(225, 124, 96, 0.2)',
+                    tension: 0.3,
+                    pointBackgroundColor: PrimaryColor,
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                }]
+            };
+            new Chart(document.getElementById('dropoutRateChart'), { type: 'line', data: dropoutData, options: chartOptions });
+
+            const uniTypeData = {
+                labels: ['2020-1', '2020-2'],
+                datasets: [{
+                    label: 'Públicas (%)',
+                    data: [9.9, 10.3],
+                    backgroundColor: SecondaryColor,
+                }, {
+                    label: 'Privadas (%)',
+                    data: [22.3, 18.9],
+                    backgroundColor: PrimaryColor,
+                }]
+            };
+            const uniTypeOptions = JSON.parse(JSON.stringify(chartOptions));
+            uniTypeOptions.plugins.legend.display = true;
+            uniTypeOptions.plugins.legend.position = 'bottom';
+            new Chart(document.getElementById('uniTypeChart'), { type: 'bar', data: uniTypeData, options: uniTypeOptions });
+
+            const mentalHealthData = {
+                labels: ['Experimentó Estrés Académico', 'Síntomas de Ansiedad', 'Síntomas de Depresión'],
+                datasets: [{
+                    label: 'Prevalencia (%)',
+                    data: [83, 52.4, 42.7],
+                    backgroundColor: ['rgba(139, 92, 246, 0.7)', 'rgba(96, 165, 250, 0.7)', 'rgba(52, 211, 153, 0.7)'],
+                    borderColor: ['#8B5CF6', '#60A5FA', '#34D399'],
+                    borderWidth: 1,
+                    hoverOffset: 4
+                }]
+            };
+            new Chart(document.getElementById('mentalHealthChart'), { type: 'doughnut', data: mentalHealthData, options: {
+                maintainAspectRatio: false,
+                responsive: true,
+                plugins: { legend: { position: 'bottom', labels: {color: FgColor} }, tooltip: chartOptions.plugins.tooltip }
+            }});
+            
+            const intentionFactorsData = {
+                 labels: ['Ansiedad', 'Aburrimiento', 'Disfrute (Inverso)', 'Control Percibido'],
+                 datasets: [{
+                    label: 'Coeficiente de Correlación (r)',
+                    data: [0.64, 0.55, -0.42, -0.37],
+                    backgroundColor: [
+                        'rgba(239, 68, 68, 0.6)',
+                        'rgba(168, 85, 247, 0.6)',
+                        'rgba(59, 130, 246, 0.6)',
+                        'rgba(34, 197, 94, 0.6)'
+                    ],
+                    borderColor: [
+                        'rgb(239, 68, 68)',
+                        'rgb(168, 85, 247)',
+                        'rgb(59, 130, 246)',
+                        'rgb(34, 197, 94)'
+                    ],
+                    borderWidth: 1
+                }]
+            };
+            const intentionOptions = {
+                 indexAxis: 'y',
+                 maintainAspectRatio: false,
+                 responsive: true,
+                 plugins: {
+                    legend: { display: false },
+                    tooltip: chartOptions.plugins.tooltip
+                 },
+                 scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: { color: FgColor },
+                        grid: { color: 'rgba(0,0,0,0.05)'}
+                    },
+                    y: {
+                        ticks: { color: FgColor },
+                        grid: { display: false }
+                    }
+                 }
+            };
+            new Chart(document.getElementById('intentionFactorsChart'), { type: 'bar', data: intentionFactorsData, options: intentionOptions});
+
+
+            const factorButtons = document.querySelectorAll('.factor-card');
+            const contentSections = document.querySelectorAll('#causas .content-section');
+            const riskCheckboxes = document.querySelectorAll('.risk-checkbox');
+            const riskFactorText = document.getElementById('risk-factor');
+
+            function updateActiveFactor(activeId) {
+                factorButtons.forEach(btn => {
+                    if (`btn-${activeId}` === btn.id) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+                contentSections.forEach(section => {
+                     if (`content-${activeId}` === section.id) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+            }
+
+            factorButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const factorId = button.id.split('-')[1];
+                    updateActiveFactor(factorId);
+                });
+            });
+
+            function calculateRisk() {
+                let totalRisk = 1;
+                let isMaleSelected = false;
+                let isFemaleSelected = false;
+
+                riskCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        if (checkbox.dataset.gender === 'male') isMaleSelected = true;
+                        if (checkbox.dataset.gender === 'female') isFemaleSelected = true;
+                    }
+                });
+                
+                riskCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        if (checkbox.dataset.gender === 'male' && isFemaleSelected) {
+                            checkbox.checked = false; 
+                        } else if (checkbox.dataset.gender === 'female' && isMaleSelected) {
+                            checkbox.checked = false;
+                        } else {
+                            totalRisk *= parseFloat(checkbox.dataset.risk);
+                        }
+                    }
+                });
+                
+                riskFactorText.textContent = `${totalRisk.toFixed(2)}x`;
+            }
+
+            riskCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', calculateRisk);
+            });
+            
+            const tabGovBtn = document.getElementById('btn-gov');
+            const tabUniBtn = document.getElementById('btn-uni');
+            const contentGov = document.getElementById('content-gov');
+            const contentUni = document.getElementById('content-uni');
+
+            tabGovBtn.addEventListener('click', () => {
+                tabGovBtn.classList.add('active');
+                tabUniBtn.classList.remove('active');
+                contentGov.classList.add('active');
+                contentUni.classList.remove('active');
+            });
+            
+             tabUniBtn.addEventListener('click', () => {
+                tabUniBtn.classList.add('active');
+                tabGovBtn.classList.remove('active');
+                contentUni.classList.add('active');
+                contentGov.classList.remove('active');
+            });
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main > section');
+
+            function onScroll() {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 80) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+            window.addEventListener('scroll', onScroll);
+
+        });
+    </script>
+</body>
+</html>
