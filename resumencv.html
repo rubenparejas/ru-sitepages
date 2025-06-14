@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV - Rubén Ángel Ruiz Parejas</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            background: white;
+            line-height: 1.6;
+        }
+
+        /* Header Section */
+        .header {
+            background: linear-gradient(135deg, #8B7EC8 0%, #6A5ACD 100%);
+            color: white;
+            text-align: center;
+            padding: 60px 40px;
+            position: relative;
+        }
+
+        .profile-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 30px;
+            border: 4px solid rgba(255,255,255,0.3);
+            overflow: hidden;
+            background: #f0f0f0;
+        }
+
+        .profile-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .header h1 {
+            font-size: 42px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .header .subtitle {
+            font-size: 18px;
+            margin-bottom: 30px;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            font-size: 16px;
+            flex-wrap: wrap;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Navigation */
+        .nav-section {
+            background: #f8f9fa;
+            padding: 20px 0;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .nav-menu {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .nav-item {
+            color: #666;
+            font-size: 16px;
+            font-weight: 500;
+            text-decoration: none;
+            padding: 10px 0;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #6A5ACD;
+            border-bottom-color: #6A5ACD;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 40px;
+            gap: 60px;
+        }
+
+        /* Stats Sidebar */
+        .stats-sidebar {
+            flex: 0 0 280px;
+        }
+
+        .stats-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .stat-item {
+            margin-bottom: 40px;
+        }
+
+        .stat-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: bold;
+            color: #6A5ACD;
+            display: block;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 8px;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+        }
+
+        .section-title {
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: #6A5ACD;
+        }
+
+        .about-text {
+            font-size: 16px;
+            line-height: 1.8;
+            text-align: justify;
+            color: #555;
+        }
+
+        .about-text p {
+            margin-bottom: 20px;
+        }
+
+        /* Call to Action Section */
+        .cta-section {
+            background: linear-gradient(135deg, #8B7EC8 0%, #6A5ACD 100%);
+            color: white;
+            text-align: center;
+            padding: 40px;
+            margin-top: 60px;
+        }
+
+        .cta-section h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .cta-section p {
+            font-size: 16px;
+            margin-bottom: 20px;
+            opacity: 0.95;
+        }
+
+        .cta-link {
+            display: inline-block;
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 18px;
+            background: rgba(255,255,255,0.2);
+            padding: 12px 30px;
+            border-radius: 25px;
+            border: 2px solid rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .cta-link:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+            }
+            
+            .header {
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+            }
+            
+            .cta-section {
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+            }
+            
+            .nav-section {
+                display: none;
+            }
+            
+            .main-content {
+                padding: 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+                padding: 40px 20px;
+            }
+            
+            .stats-sidebar {
+                flex: none;
+            }
+            
+            .contact-info {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-menu {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="profile-photo">
+            <img src="./imagenes/Foto-Ru.png" alt="Rubén Ángel Ruiz Parejas">
+        </div>
+        <h1>Rubén Ángel Ruiz Parejas</h1>
+        <p class="subtitle">Ingeniero en Informática | MBA | Candidato a Doctor en Administración</p>
+        <div class="contact-info">
+            <div class="contact-item">
+                <span>📞 +51 932-286-154</span>
+            </div>
+            <div class="contact-item">
+                <span>✉️ rubenparejas@gmail.com</span>
+            </div>
+            <div class="contact-item">
+                <span>📍 Huancayo, Perú</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-section">
+        <div class="nav-menu">
+            <a href="#" class="nav-item active">Sobre Mí</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Stats Sidebar -->
+        <div class="stats-sidebar">
+            <div class="stats-box">
+                <div class="stat-item">
+                    <span class="stat-number">15+</span>
+                    <div class="stat-label">AÑOS DE EXPERIENCIA</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">50+</span>
+                    <div class="stat-label">PROYECTOS COMPLETADOS</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">3</span>
+                    <div class="stat-label">PUBLICACIONES SCOPUS</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">2</span>
+                    <div class="stat-label">EMPRENDIMIENTOS</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <h2 class="section-title">Sobre Mí</h2>
+            <div class="about-text">
+                <p>Soy Ingeniero Informático con un MBA en Administración de Empresas y estudios doctorales en Administración por la Universidad de Buenos Aires. Cuento con más de 16 años de experiencia en el sector universitario, donde he trabajado como programador, analista programador y coordinador de operaciones, liderando proyectos orientados a la mejora de procesos, automatización y transformación digital.</p>
+
+                <p>Actualmente me desempeño como investigador RENACYT y docente universitario en dos instituciones, dictando cursos en áreas como arquitectura empresarial, informática, gestión de proyectos y metodología de la investigación. Mi enfoque profesional combina la enseñanza con la investigación aplicada, especialmente en temas relacionados con inteligencia artificial, aprendizaje automático, ciencia de datos y tecnologías educativas.</p>
+
+                <p>Además, diseño soluciones tecnológicas orientadas al sector académico y empresarial. Me interesa especialmente la aplicación de las tecnologías de la información para optimizar la educación y la gestión académica.</p>
+
+                <p>Me caracterizo por tener una visión analítica, estratégica y emprendedora. Estoy abierto a colaborar en proyectos que integren tecnología, educación e innovación con impacto real.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action Section -->
+    <div class="cta-section">
+        <h3>¿Quieres saber más de mí?</h3>
+        <p>Ingresa al siguiente portal web para conocer más detalles sobre mi experiencia profesional, proyectos y logros.</p>
+        <a href="https://bit.ly/4labv55" class="cta-link">🌐 https://bit.ly/4labv55</a>
+    </div>
+</body>
+</html>
