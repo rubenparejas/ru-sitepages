@@ -1,233 +1,366 @@
-/* Estilos Generales */
-body {
-    font-family: 'Arial', sans-serif;
-    line-height: 1.6;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f4;
-    color: #333;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rubén Ángel Ruiz Parejas - IT Professional</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+            color: #333;
+        }
 
-.container {
-    max-width: 960px;
-    margin: 20px auto;
-    padding: 0 20px;
-}
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
 
-.section {
-    background: #fff;
-    padding: 30px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
+        header {
+            background: #333;
+            color: #fff;
+            padding: 2rem 0;
+            text-align: center;
+        }
 
-h1, h2, h3, h4 {
-    color: #2c3e50;
-}
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
 
-a {
-    color: #3498db;
-    text-decoration: none;
-}
+        header p {
+            font-size: 1.2rem;
+        }
 
-a:hover {
-    text-decoration: underline;
-}
+        nav {
+            background: #444;
+            color: #fff;
+            padding: 0.5rem 0;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
 
-/* Header (Héroe) */
-.hero {
-    background-color: #34495e;
-    color: #fff;
-    text-align: center;
-    padding: 60px 20px;
-    position: relative;
-    overflow: hidden;
-}
+        nav a {
+            color: #fff;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
 
-.hero::before {
-    content: '';
-    background: rgba(0,0,0,0.2);
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1;
-}
+        nav a:hover {
+            background: #555;
+        }
 
-.hero-content {
-    position: relative;
-    z-index: 2;
-}
+        section {
+            padding: 2rem 0;
+            border-bottom: 1px solid #ddd;
+        }
 
-.profile-pic {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 5px solid #fff;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
+        section:last-of-type {
+            border-bottom: none;
+        }
 
-.hero h1 {
-    margin: 10px 0;
-    font-size: 2.8em;
-    color: #fff;
-}
+        h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            color: #333;
+        }
 
-.hero p {
-    font-size: 1.2em;
-    margin-bottom: 20px;
-}
+        .about-me-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            align-items: center;
+        }
 
-.contact-info {
-    margin-top: 20px;
-}
+        .about-me-grid img {
+            width: 100%;
+            border-radius: 50%;
+        }
 
-.contact-info a {
-    color: #fff;
-    margin: 0 10px;
-    font-size: 1.1em;
-}
+        #about p {
+            text-align: justify;
+        }
 
-.contact-info a i {
-    margin-right: 5px;
-}
+        .job, .education-item, .certification-item, .research-item, .venture-item {
+            background: #fff;
+            margin-bottom: 1rem;
+            padding: 1.5rem;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
 
-/* Barra de Navegación */
-.navbar {
-    background-color: #2c3e50;
-    padding: 15px 0;
-    text-align: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    position: sticky; /* Hace que la nav bar se quede fija al hacer scroll */
-    top: 0;
-    z-index: 1000;
-}
+        .job h3, .education-item h3, .certification-item h3, .research-item h3, .venture-item h3 {
+            margin-top: 0;
+            color: #333;
+        }
 
-.navbar ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap; /* Para que se adapte mejor en pantallas pequeñas */
-}
+        .job span, .education-item span, .certification-item span {
+            display: block;
+            color: #777;
+            margin-bottom: 1rem;
+        }
 
-.navbar ul li {
-    margin: 0 15px;
-}
+        ul {
+            list-style: none;
+            padding: 0;
+        }
 
-.navbar ul li a {
-    color: #fff;
-    text-decoration: none;
-    font-weight: bold;
-    padding: 8px 15px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
+        ul li {
+            background: #fff;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-radius: 3px;
+        }
 
-.navbar ul li a:hover {
-    background-color: #3498db;
-    text-decoration: none;
-}
+        #skills .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
 
-/* Sección de Experiencia Profesional */
-.job-entry {
-    border-left: 4px solid #3498db;
-    padding-left: 15px;
-    margin-bottom: 20px;
-}
+        footer {
+            background: #333;
+            color: #fff;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 2rem;
+        }
+        
+        @media(max-width: 768px){
+            .container{
+                width: 90%;
+            }
+            .about-me-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
 
-.job-entry h3 {
-    margin-top: 0;
-    margin-bottom: 5px;
-    color: #2c3e50;
-}
+    <header>
+        <div class="container">
+            <h1>Rubén Ángel Ruiz Parejas</h1>
+            <p>Computer Engineer | MBA | PhD in Administration Candidate</p>
+        </div>
+    </header>
 
-.job-entry .date {
-    font-style: italic;
-    color: #777;
-    margin-bottom: 10px;
-}
+    <nav>
+        <div class="container">
+            <a href="#about">About Me</a>
+            <a href="#experience">Experience</a>
+            <a href="#education">Education</a>
+            <a href="#certifications">Certifications</a>
+            <a href="#research">Research</a>
+            <a href="#entrepreneurship">Entrepreneurship</a>
+            <a href="#skills">Skills</a>
+            <a href="#contact">Contact</a>
+        </div>
+    </nav>
 
-.job-entry .logro {
-    font-weight: bold;
-    color: #27ae60;
-}
+    <section id="about">
+        <div class="container">
+            <h2>About Me</h2>
+            <div class="about-me-grid">
+                <div>
+                    <img src="https://via.placeholder.com/400" alt="Rubén Ángel Ruiz Parejas">
+                </div>
+                <div>
+                    <p>I am a Computer Engineer with an MBA and currently pursuing a Doctorate in Administration. Recognized as a qualified researcher by Renacyt, I specialize in fostering innovation within organizations. I have a strong background in business management, operations, and directing technological projects and software engineering, contributing to strategies that enhance corporate development and digitalization.</p>
+                    <p>As a University Professor, I teach specialized courses in Business Engineering and Systems and Computer Engineering. Throughout my career, I have dedicated my efforts and knowledge to developing practical solutions that positively impact clients. I have led multidisciplinary teams in managing technology projects, creating and implementing innovations that improve both customer experience and business profitability.</p>
+                    <p>My unique combination of skills in management, business understanding, IT, and market strategies allows me to design and execute efficient technological projects, optimizing both client satisfaction and the financial results of companies.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-/* Secciones de Habilidades y Emprendimientos */
-.skill-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 15px;
-}
+    <section id="experience">
+        <div class="container">
+            <h2>Professional Experience</h2>
+            <div class="job">
+                <h3>University Professor</h3>
+                <span>Universidad Tecnológica del Perú (UTP) | 2023 - Present</span>
+                <p>Teaching specialized courses in the Systems and Computer Engineering program, including: Databases, Research Workshop, and Principles of Algorithms.</p>
+            </div>
+            <div class="job">
+                <h3>University Professor</h3>
+                <span>Universidad Continental | 2020 - Present</span>
+                <p>Researcher and professor of specialized courses in the Business Engineering and Systems and Computer Engineering programs. Subjects taught include: Final Project in Business Engineering, Business Architecture, Process Engineering, Databases, and Information Systems.</p>
+            </div>
+             <div class="job">
+                <h3>Accreditation Project Member</h3>
+                <span>Faculty of Engineering, Universidad Continental | 2020 - 2022</span>
+                <p>Participated in a corporate project for the accreditation of the Business Engineering and Electrical Engineering programs with the ICACIT agency. My role included creating documentation and ensuring compliance with the accrediting agency's quality standards.</p>
+                <p><strong>Achievement:</strong> Successfully obtained the accreditation for the Electrical Engineering program.</p>
+            </div>
+            <div class="job">
+                <h3>ICT Operations Coordinator</h3>
+                <span>Universidad Continental | 2016 - 2020</span>
+                <p>Directed and ensured the operation of the University's Information Systems, including the Ellucian Banner Student ERP, servers, connectivity, and other institutional technologies. I also led technology and software development projects based on management analysis and user needs.</p>
+                <p>Implemented management standards like PMI for efficient supervision of technology projects and adopted agile methodologies like SCRUM for effective control of software project iterations.</p>
+            </div>
+            <div class="job">
+                <h3>Systems Analyst | Programmer Analyst | Software Development Assistant</h3>
+                <span>Instituto Continental | 2012 - 2016</span>
+                <p>Played a key role as a leader in the analysis, planning, programming, monitoring, and control of software projects. I implemented SCRUM methods and techniques as best practices, enabling continuous iterations, effective risk management, and constant communication.</p>
+                <p><strong>Achievement:</strong> Was part of the team that achieved the accreditation of the Instituto Continental's careers, first by CONEACES and then for a second time by SUNEDU.</p>
+            </div>
+            <div class="job">
+                <h3>Branch Manager</h3>
+                <span>ENVIOSIN S.R.L | 2009 - 2010</span>
+                <p>Successfully managed a business unit of an international courier, leading all key aspects from resource management, logistics, and quality to innovation and finance. My strategic focus was on establishing short and long-term plans to optimize branch productivity and maximize results.</p>
+            </div>
+            <div class="job">
+                <h3>Programmer Analyst</h3>
+                <span>Caja Huancayo | 2006</span>
+                <p>Led the development, design, testing, and implementation of an innovative software for managing the tabulation, processing, and analysis of results from Caja Huancayo's positioning surveys in the Junín region.</p>
+            </div>
+        </div>
+    </section>
 
-.skill-list span {
-    background-color: #ecf0f1;
-    padding: 8px 15px;
-    border-radius: 20px;
-    font-size: 0.9em;
-    color: #555;
-    border: 1px solid #ddd;
-}
+    <section id="education">
+        <div class="container">
+            <h2>Education</h2>
+            <div class="education-item">
+                <h3>Doctor of Business Administration (Studying)</h3>
+                <span>UBA | Universidad de Buenos Aires</span>
+            </div>
+            <div class="education-item">
+                <h3>Diploma in Project and Organization Management: Complex Challenges</h3>
+                <span>MIT | XPRO - Massachusetts Institute of Technology | 2022</span>
+            </div>
+            <div class="education-item">
+                <h3>Diploma in Digital Transformation: Technologies and their basic applications</h3>
+                <span>MIT | PROFESSIONAL - Massachusetts Institute of Technology | 2020-2021</span>
+            </div>
+            <div class="education-item">
+                <h3>Master in Strategic Business Administration</h3>
+                <span>Pontificia Universidad Católica del Perú | 2012-2014</span>
+            </div>
+            <div class="education-item">
+                <h3>Title in Computer Engineering</h3>
+                <span>Universidad Continental | 2001-2005</span>
+            </div>
+        </div>
+    </section>
 
-.emprendimiento-entry {
-    margin-bottom: 20px;
-    border-bottom: 1px dashed #eee;
-    padding-bottom: 15px;
-}
+    <section id="certifications">
+        <div class="container">
+            <h2>Certifications</h2>
+            <div class="certification-item">
+                <h3>PMI Project Management Ready</h3>
+                <span>Project Management Institute | 2022</span>
+            </div>
+            <div class="certification-item">
+                <h3>Microsoft Certified Azure Fundamentals</h3>
+                <span>Microsoft | 2021</span>
+            </div>
+            <div class="certification-item">
+                <h3>Python esencial</h3>
+                <span>LinkedIn | 2021</span>
+            </div>
+             <div class="certification-item">
+                <h3>Service Desk Manager</h3>
+                <span>Service Desk Institute | 2019</span>
+            </div>
+            <div class="certification-item">
+                <h3>Curso Básico de Marketing Digital</h3>
+                <span>Google Actívate Lab España | 2017</span>
+            </div>
+        </div>
+    </section>
 
-.emprendimiento-entry:last-child {
-    border-bottom: none;
-}
+    <section id="research">
+        <div class="container">
+            <h2>Research & Publications</h2>
+            <div class="research-item">
+                <h3>Master's Thesis: "Quality of Companies in the Higher Education Sector in Junín"</h3>
+                <span>CENTRUM Católica | 2015</span>
+            </div>
+            <div class="research-item">
+                <h3>SCOPUS Publication (2021): "A Machine Learning Approach to Find the Determinants of Peruvian Coca Illegal Crops"</h3>
+                <a href="https://bit.ly/3AGMOJ9" target="_blank">Read Publication</a>
+            </div>
+            <div class="research-item">
+                <h3>SCOPUS Publication (2021): "A Machine Learning Approach to Find the Determinants of Peruvian Cocaine Local Price"</h3>
+                <a href="https://bit.ly/3AEidLZ" target="_blank">Read Publication</a>
+            </div>
+            <div class="research-item">
+                <h3>SCOPUS Publication (2022): "The impact of electronic commerce on the Peruvian firms' revenue"</h3>
+                <a href="https://bit.ly/3Uki0EU" target="_blank">Read Publication</a>
+            </div>
+        </div>
+    </section>
 
-.emprendimiento-entry h4 {
-    margin-bottom: 5px;
-    color: #3498db;
-}
+    <section id="entrepreneurship">
+        <div class="container">
+            <h2>Entrepreneurship</h2>
+            <div class="venture-item">
+                <h3>Founder - MICIUDAD</h3>
+                <span>2016-2018</span>
+                <p>Creator and co-promoter of the first mobile application and virtual e-commerce and delivery service platform in the city of Huancayo.</p>
+            </div>
+            <div class="venture-item">
+                <h3>Founding Partner - Avanti: Psychotherapeutic Center</h3>
+                <span>2022-Present</span>
+                <p>Co-founder and co-promoter of the first online psychotherapeutic center in Huancayo, specializing in family and couple therapy. <a href="https://cpsavanti.com/" target="_blank">Visit Avanti</a></p>
+            </div>
+        </div>
+    </section>
 
-/* Footer */
-.footer {
-    text-align: center;
-    padding: 20px;
-    background-color: #2c3e50;
-    color: #fff;
-    font-size: 0.9em;
-    margin-top: 30px;
-}
+    <section id="skills">
+        <div class="container">
+            <h2>Additional Knowledge & Skills</h2>
+            <div class="skills-grid">
+                <ul>
+                    <li>Enterprise Architecture (TOGAF)</li>
+                    <li>Archimate 4.0</li>
+                    <li>ABACUS</li>
+                    <li>Process Management</li>
+                    <li>Advanced SQL</li>
+                    <li>Intermediate Microsoft Project</li>
+                </ul>
+                <ul>
+                    <li>Six Sigma</li>
+                    <li>Facebook Ads & Google Analytics</li>
+                    <li>Advanced Microsoft Office</li>
+                    <li>Advanced Microsoft Visual Studio</li>
+                    <li>Intermediate Python</li>
+                    <li>Wordpress</li>
+                </ul>
+                 <ul>
+                    <li>Intermediate ASP</li>
+                    <li>Intermediate HTML 5</li>
+                    <li>Advanced Power Builder 11.5</li>
+                    <li>Intermediate R</li>
+                </ul>
+            </div>
+        </div>
+    </section>
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .hero h1 {
-        font-size: 2em;
-    }
+    <section id="contact">
+        <div class="container">
+            <h2>Contact</h2>
+            <p>I am always open to discussing new projects, creative ideas, or opportunities to be part of something amazing.</p>
+            <p><strong>Phone:</strong> 932-286-154</p>
+            <p><strong>Email:</strong> <a href="mailto:rubenparejas@gmail.com">rubenparejas@gmail.com</a> | <a href="mailto:ru.parejas@hotmail.com">ru.parejas@hotmail.com</a></p>
+        </div>
+    </section>
 
-    .hero p {
-        font-size: 1em;
-    }
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Rubén Ángel Ruiz Parejas. All Rights Reserved.</p>
+        </div>
+    </footer>
 
-    .navbar ul {
-        flex-direction: column;
-        padding: 10px 0;
-    }
-
-    .navbar ul li {
-        margin: 5px 0;
-    }
-
-    .container {
-        padding: 0 15px;
-    }
-
-    .section {
-        padding: 20px;
-    }
-
-    .skill-list {
-        justify-content: center;
-    }
-}
+</body>
+</html>
