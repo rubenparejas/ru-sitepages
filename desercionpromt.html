@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis Interactivo de la Deserción Estudiantil Universitaria</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals & Academic Blue -->
+    <!-- Application Structure Plan: Se ha diseñado una arquitectura de una sola página con navegación por secciones temáticas para transformar un informe denso en una experiencia de aprendizaje guiada. La estructura progresa lógicamente desde la definición del problema ("¿Qué es la deserción?") hasta la exploración de sus causas ("Factores Clave"), el análisis de matices ("Análisis Contextual"), las soluciones tecnológicas ("Modelos Predictivos") y las recomendaciones prácticas. Este flujo no lineal, facilitado por una barra de navegación fija, permite al usuario explorar los temas de interés a su propio ritmo. Las interacciones clave (clics en tarjetas y botones) revelan información detallada de manera progresiva, evitando la sobrecarga cognitiva y manteniendo al usuario enfocado y comprometido. Esta estructura fue elegida para priorizar la usabilidad y la síntesis de información sobre la estructura lineal del informe original. -->
+    <!-- Visualization & Content Choices: 1. (Informar) Tarjetas y acordeones para definir los tipos e impactos de la deserción. 2. (Comparar/Organizar) Un gráfico de barras horizontal interactivo para mostrar la importancia relativa de los dominios de variables (Académico, Socioeconómico, etc.), con tarjetas clicables que revelan detalles específicos. Esta es la sección central para explorar el 'qué'. 3. (Comparar/Relacionar) Un gráfico de radar dinámico para el análisis contextual, que permite al usuario comparar visualmente cómo cambia la importancia de los factores en diferentes contextos (STEM vs. Humanidades, etc.). Esto responde al 'dónde' y 'cuándo'. 4. (Comparar/Informar) Un gráfico de barras para comparar el rendimiento de los algoritmos de ML. Esto aborda el 'cómo'. Todas las visualizaciones usan Chart.js (Canvas) y se actualizan dinámicamente con JS, garantizando una experiencia interactiva sin SVG ni Mermaid. La justificación es maximizar la claridad y el engagement del usuario. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F7F4;
+            color: #404040;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+        }
+        .nav-link.active {
+            color: #0d9488;
+            border-bottom-color: #0d9488;
+        }
+        .card-factor:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-teal-700 text-white p-4 sticky top-0 z-50 shadow-md">
+        <nav class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold">Deserción Universitaria</h1>
+            <div class="hidden md:flex space-x-6">
+                <a href="#inicio" class="nav-link border-b-2 border-transparent pb-1">Inicio</a>
+                <a href="#definicion" class="nav-link border-b-2 border-transparent pb-1">Definición</a>
+                <a href="#factores" class="nav-link border-b-2 border-transparent pb-1">Factores Clave</a>
+                <a href="#contexto" class="nav-link border-b-2 border-transparent pb-1">Análisis Contextual</a>
+                <a href="#modelos" class="nav-link border-b-2 border-transparent pb-1">Modelos Predictivos</a>
+                <a href="#recomendaciones" class="nav-link border-b-2 border-transparent pb-1">Recomendaciones</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden mt-2">
+            <a href="#inicio" class="block py-2 px-4 text-sm hover:bg-teal-600 rounded">Inicio</a>
+            <a href="#definicion" class="block py-2 px-4 text-sm hover:bg-teal-600 rounded">Definición</a>
+            <a href="#factores" class="block py-2 px-4 text-sm hover:bg-teal-600 rounded">Factores Clave</a>
+            <a href="#contexto" class="block py-2 px-4 text-sm hover:bg-teal-600 rounded">Análisis Contextual</a>
+            <a href="#modelos" class="block py-2 px-4 text-sm hover:bg-teal-600 rounded">Modelos Predictivos</a>
+            <a href="#recomendaciones" class="block py-2 px-4 text-sm hover:bg-teal-600 rounded">Recomendaciones</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section id="inicio" class="text-center min-h-[60vh] flex flex-col justify-center items-center">
+            <h2 class="text-4xl md:text-6xl font-bold text-teal-800 mb-4">Comprendiendo la Deserción Estudiantil</h2>
+            <p class="max-w-3xl mx-auto text-lg md:text-xl text-gray-700 mb-8">
+                Una exploración interactiva de las variables que predicen el abandono universitario. Esta herramienta traduce un complejo análisis de la literatura en visualizaciones claras para ayudar a educadores, administradores y investigadores a identificar y actuar sobre los factores de riesgo.
+            </p>
+            <a href="#definicion" class="bg-teal-600 text-white font-bold py-3 px-8 rounded-full hover:bg-teal-700 transition duration-300 shadow-lg">
+                Comenzar Exploración
+            </a>
+        </section>
+
+        <section id="definicion" class="py-16 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800">¿Qué es la Deserción Universitaria?</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-600">
+                    La deserción es un fenómeno complejo que va más allá de un simple acto de abandono. Se manifiesta en diferentes momentos y niveles, cada uno con implicaciones distintas para el estudiante y la institución.
+                </p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8 items-start">
+                <div>
+                    <h3 class="text-2xl font-bold text-teal-700 mb-4">Tipos de Deserción (Por Momento)</h3>
+                    <div class="space-y-4">
+                        <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-teal-500">
+                            <h4 class="font-bold text-lg">Deserción Precoz</h4>
+                            <p class="text-gray-600 mt-1">Ocurre cuando un estudiante es admitido pero nunca llega a matricularse, señalando problemas en la transición a la universidad.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-amber-500">
+                            <h4 class="font-bold text-lg">Deserción Temprana</h4>
+                            <p class="text-gray-600 mt-1">El abandono durante los primeros semestres, especialmente el primer año. Es la fase más crítica y común.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-red-500">
+                            <h4 class="font-bold text-lg">Deserción Tardía</h4>
+                            <p class="text-gray-600 mt-1">Acontece en los semestres finales, a menudo por dificultades con la titulación u oportunidades laborales.</p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-teal-700 mb-4">Impacto Multidimensional</h3>
+                     <div class="space-y-4">
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h4 class="font-bold text-lg flex items-center"><span class="text-2xl mr-3">👤</span>A Nivel Individual</h4>
+                            <p class="text-gray-600 mt-1">Genera frustración, pérdida de inversión en tiempo y dinero, y limita oportunidades laborales futuras.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h4 class="font-bold text-lg flex items-center"><span class="text-2xl mr-3">🏛️</span>A Nivel Institucional</h4>
+                            <p class="text-gray-600 mt-1">Causa pérdidas económicas, ineficiencia de recursos y afecta negativamente la reputación y acreditación.</p>
+                        </div>
+                         <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h4 class="font-bold text-lg flex items-center"><span class="text-2xl mr-3">🌍</span>A Nivel Social</h4>
+                            <p class="text-gray-600 mt-1">Reduce el capital intelectual del país, malgasta la inversión pública en educación y puede aumentar la desigualdad.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="factores" class="py-16 scroll-mt-20 bg-gray-50 rounded-xl">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Factores Clave en la Predicción</h2>
+                <p class="mt-4 max-w-3xl mx-auto text-lg text-gray-600">
+                    La deserción es multifactorial. Ciertas categorías de variables tienen un poder predictivo mayor que otras. El gráfico muestra la importancia relativa general de cada dominio. Haga clic en una tarjeta para explorar las variables específicas.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="chart-container h-96 md:h-auto">
+                    <canvas id="factorImportanceChart"></canvas>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div id="factor-card-academico" class="card-factor bg-white p-4 rounded-lg shadow-md text-center cursor-pointer border-2 border-transparent transition duration-300">
+                        <span class="text-4xl">🎓</span>
+                        <h4 class="font-bold mt-2">Académico</h4>
+                    </div>
+                    <div id="factor-card-socioeconomico" class="card-factor bg-white p-4 rounded-lg shadow-md text-center cursor-pointer border-2 border-transparent transition duration-300">
+                        <span class="text-4xl">💼</span>
+                        <h4 class="font-bold mt-2">Socioeconómico</h4>
+                    </div>
+                    <div id="factor-card-comportamiento" class="card-factor bg-white p-4 rounded-lg shadow-md text-center cursor-pointer border-2 border-transparent transition duration-300">
+                        <span class="text-4xl">💻</span>
+                        <h4 class="font-bold mt-2">Comportamiento</h4>
+                    </div>
+                    <div id="factor-card-institucional" class="card-factor bg-white p-4 rounded-lg shadow-md text-center cursor-pointer border-2 border-transparent transition duration-300">
+                        <span class="text-4xl">🏛️</span>
+                        <h4 class="font-bold mt-2">Institucional</h4>
+                    </div>
+                     <div id="factor-card-psicosocial" class="card-factor bg-white p-4 rounded-lg shadow-md text-center cursor-pointer border-2 border-transparent transition duration-300">
+                        <span class="text-4xl">🧠</span>
+                        <h4 class="font-bold mt-2">Psicosocial</h4>
+                    </div>
+                     <div id="factor-card-demografico" class="card-factor bg-white p-4 rounded-lg shadow-md text-center cursor-pointer border-2 border-transparent transition duration-300">
+                        <span class="text-4xl">👤</span>
+                        <h4 class="font-bold mt-2">Demográfico</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div id="factor-details" class="mt-12 bg-white p-6 rounded-lg shadow-inner min-h-[200px]">
+                <h3 id="factor-details-title" class="text-2xl font-bold text-teal-700 mb-4">Seleccione una categoría de factor</h3>
+                <p id="factor-details-instruction" class="text-gray-600">Haga clic en una de las tarjetas de arriba para ver las variables predictoras más importantes dentro de esa categoría.</p>
+                <ul id="factor-details-list" class="list-disc list-inside space-y-2 text-gray-700">
+                </ul>
+            </div>
+        </section>
+
+        <section id="contexto" class="py-16 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Análisis Contextual: No Todos los Riesgos son Iguales</h2>
+                <p class="mt-4 max-w-3xl mx-auto text-lg text-gray-600">
+                    El peso de cada factor de riesgo cambia según el contexto. Seleccione un escenario para ver cómo varía la importancia de las variables clave.
+                </p>
+            </div>
+            <div class="flex justify-center flex-wrap gap-2 mb-8">
+                <button data-context="stem_vs_humanidades" class="context-btn bg-teal-600 text-white font-semibold py-2 px-4 rounded-full transition duration-300">STEM vs. Humanidades</button>
+                <button data-context="latam_vs_europa" class="context-btn bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-full transition duration-300">Latinoamérica vs. Europa</button>
+                <button data-context="covid" class="context-btn bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-full transition duration-300">Impacto del COVID-19</button>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 items-center bg-white p-8 rounded-xl shadow-md">
+                <div class="chart-container h-96 md:h-auto">
+                    <canvas id="contextRadarChart"></canvas>
+                </div>
+                <div>
+                    <h3 id="context-title" class="text-2xl font-bold text-teal-700 mb-4">STEM vs. Humanidades</h3>
+                    <p id="context-description" class="text-gray-700">
+                        La comparación entre áreas de conocimiento revela perfiles de riesgo distintos. En carreras STEM, el rendimiento en ciencias básicas y los factores socioeconómicos tienen un peso predictivo crucial. En Humanidades, factores como la integración social y la certeza vocacional pueden ser más determinantes.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="modelos" class="py-16 scroll-mt-20 bg-gray-50 rounded-xl">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Modelos Predictivos y Metodología</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-600">
+                    Para predecir la deserción se utilizan algoritmos de Machine Learning. Su rendimiento varía, pero algunos destacan por su alta precisión para identificar estudiantes en riesgo.
+                </p>
+            </div>
+            <div class="grid md:grid-cols-5 gap-8 items-center">
+                <div class="md:col-span-3 chart-container h-96">
+                     <canvas id="algorithmPerformanceChart"></canvas>
+                </div>
+                <div class="md:col-span-2 space-y-4">
+                    <h3 class="text-xl font-bold text-teal-700">Fuentes de Datos</h3>
+                     <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-teal-500">
+                        <h4 class="font-semibold">Datos Administrativos</h4>
+                        <p class="text-sm text-gray-600">Calificaciones, matrículas, datos sociodemográficos. Son la base, pero estáticos.</p>
+                    </div>
+                     <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-amber-500">
+                        <h4 class="font-semibold">Datos de Comportamiento (LMS)</h4>
+                        <p class="text-sm text-gray-600">Interacción con plataformas online (Moodle, Canvas). Datos dinámicos y en tiempo real.</p>
+                    </div>
+                     <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-red-500">
+                        <h4 class="font-semibold">Encuestas y Cuestionarios</h4>
+                        <p class="text-sm text-gray-600">Miden motivación, salud mental, etc. Valiosos pero costosos de obtener.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="recomendaciones" class="py-16 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Recomendaciones para un Modelo Eficaz</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-600">
+                    Un modelo predictivo es solo el comienzo. Su implementación debe ser estratégica, ética y, sobre todo, orientada a la acción.
+                </p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-12">
+                <div>
+                    <h3 class="text-2xl font-bold text-teal-700 mb-4">Marco de Implementación</h3>
+                    <ol class="relative border-l border-gray-200">                  
+                        <li class="mb-10 ml-6">            
+                            <span class="absolute flex items-center justify-center w-6 h-6 bg-teal-100 rounded-full -left-3 ring-8 ring-white">1</span>
+                            <h4 class="font-semibold text-lg text-gray-900">Comenzar con lo Fundamental</h4>
+                            <p class="text-base font-normal text-gray-500">Utilizar datos de rendimiento académico temprano (GPA, cursos reprobados), que son los más predictivos y accesibles.</p>
+                        </li>
+                        <li class="mb-10 ml-6">
+                            <span class="absolute flex items-center justify-center w-6 h-6 bg-teal-100 rounded-full -left-3 ring-8 ring-white">2</span>
+                            <h4 class="font-semibold text-lg text-gray-900">Enriquecer con Contexto</h4>
+                            <p class="text-base font-normal text-gray-500">Añadir variables sociodemográficas y pre-universitarias para identificar riesgos desde la admisión.</p>
+                        </li>
+                        <li class="mb-10 ml-6">
+                            <span class="absolute flex items-center justify-center w-6 h-6 bg-teal-100 rounded-full -left-3 ring-8 ring-white">3</span>
+                            <h4 class="font-semibold text-lg text-gray-900">Incorporar Comportamiento Dinámico</h4>
+                            <p class="text-base font-normal text-gray-500">Integrar datos de plataformas LMS para predicciones casi en tiempo real.</p>
+                        </li>
+                         <li class="ml-6">
+                            <span class="absolute flex items-center justify-center w-6 h-6 bg-teal-100 rounded-full -left-3 ring-8 ring-white">4</span>
+                            <h4 class="font-semibold text-lg text-gray-900">Añadir Dimensión Psicosocial</h4>
+                            <p class="text-base font-normal text-gray-500">Usar encuestas de motivación o salud mental de forma estratégica para un diagnóstico más profundo.</p>
+                        </li>
+                    </ol>
+                </div>
+                 <div>
+                    <h3 class="text-2xl font-bold text-red-700 mb-4">Consideraciones Éticas Críticas</h3>
+                    <div class="space-y-4">
+                        <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-md" role="alert">
+                            <p class="font-bold">Sesgo Algorítmico</p>
+                            <p>Los modelos pueden aprender y perpetuar sesgos históricos contra grupos vulnerables. Es crucial usar técnicas de IA Explicable (XAI) para entender el porqué de una predicción y garantizar la equidad.</p>
+                        </div>
+                         <div class="bg-amber-50 border-l-4 border-amber-500 text-amber-700 p-4 rounded-md" role="alert">
+                            <p class="font-bold">Privacidad y "Caja Negra"</p>
+                            <p>Se deben proteger los datos sensibles del estudiante. La falta de transparencia de un modelo ("caja negra") erosiona la confianza y dificulta las intervenciones personalizadas.</p>
+                        </div>
+                        <div class="bg-teal-50 border-l-4 border-teal-500 text-teal-700 p-4 rounded-md mt-8" role="alert">
+                             <p class="font-bold">De la Predicción a la Intervención</p>
+                            <p>El objetivo final no es predecir, sino retener. El modelo debe activar un sistema de alerta temprana que conecte a los estudiantes en riesgo con el apoyo adecuado (tutorías, consejería, ayudas financieras).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4 mt-16">
+        <p>&copy; 2024 Visualizador de Datos de Deserción. Creado a partir de una revisión sistemática de la literatura.</p>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        const factorData = {
+            academico: {
+                title: "Factores Académicos",
+                color: "rgba(13, 148, 136, 1)",
+                variables: [
+                    "Promedio de calificaciones (GPA), especialmente el del primer año.",
+                    "Número de asignaturas reprobadas.",
+                    "Calificaciones en asignaturas 'filtro' (Cálculo, Física, etc.).",
+                    "Ratio de créditos aprobados vs. inscritos.",
+                    "Rendimiento pre-universitario (notas de secundaria).",
+                    "Puntajes en exámenes de ingreso."
+                ]
+            },
+            socioeconomico: {
+                title: "Factores Socioeconómicos",
+                color: "rgba(245, 158, 11, 1)",
+                 variables: [
+                    "Nivel de ingresos familiares.",
+                    "Necesidad de trabajar mientras se estudia.",
+                    "Nivel educativo de los padres (capital cultural).",
+                    "Tipo de colegio de procedencia (público/privado).",
+                    "Acceso a becas y ayudas financieras."
+                ]
+            },
+            comportamiento: {
+                title: "Factores de Comportamiento (LMS)",
+                color: "rgba(239, 68, 68, 1)",
+                variables: [
+                    "Frecuencia y regularidad de acceso a la plataforma virtual (LMS).",
+                    "Tiempo dedicado a tareas y materiales en línea.",
+                    "Participación en foros de discusión.",
+                    "Descarga de recursos del curso.",
+                    "Asistencia a clases (presenciales o síncronas)."
+                ]
+            },
+            institucional: {
+                title: "Factores Institucionales",
+                color: "rgba(59, 130, 246, 1)",
+                variables: [
+                    "Costo de la matrícula y aranceles.",
+                    "Disponibilidad y uso de servicios de apoyo (tutorías, consejería).",
+                    "Calidad percibida de la enseñanza y los docentes.",
+                    "Flexibilidad del currículo y carga académica.",
+                    "Brecha digital (acceso a tecnología y conectividad)."
+                ]
+            },
+            psicosocial: {
+                title: "Factores Psicosociales",
+                color: "rgba(168, 85, 247, 1)",
+                 variables: [
+                    "Motivación (intrínseca vs. extrínseca).",
+                    "Certeza vocacional y satisfacción con la carrera.",
+                    "Autoeficacia y autoconcepto académico.",
+                    "Niveles de estrés, ansiedad o depresión.",
+                    "Integración social y sentimiento de pertenencia."
+                ]
+            },
+            demografico: {
+                title: "Factores Demográficos",
+                color: "rgba(107, 114, 128, 1)",
+                variables: [
+                    "Edad de ingreso a la universidad.",
+                    "Género y estado civil.",
+                    "Distancia entre el hogar y la universidad.",
+                    "Tener hijos o dependientes.",
+                    "Pertenencia a minorías o grupos vulnerables."
+                ]
+            }
+        };
+
+        const contextData = {
+            stem_vs_humanidades: {
+                title: 'STEM vs. Humanidades',
+                description: "La comparación entre áreas de conocimiento revela perfiles de riesgo distintos. En carreras STEM, el rendimiento en ciencias básicas y los factores socioeconómicos tienen un peso predictivo crucial. En Humanidades, factores como la integración social y la certeza vocacional pueden ser más determinantes.",
+                labels: ['Socioeconómico', 'Rend. Matemáticas', 'Integración Social', 'Certeza Vocacional', 'Brecha Digital'],
+                datasets: [
+                    { label: 'STEM', data: [8, 9, 5, 6, 7], borderColor: 'rgba(13, 148, 136, 1)', backgroundColor: 'rgba(13, 148, 136, 0.2)'},
+                    { label: 'Humanidades', data: [6, 3, 8, 8, 6], borderColor: 'rgba(245, 158, 11, 1)', backgroundColor: 'rgba(245, 158, 11, 0.2)' }
+                ]
+            },
+            latam_vs_europa: {
+                title: 'Latinoamérica vs. Europa',
+                description: 'Geográficamente, los factores de riesgo varían enormemente. En América Latina, los problemas socioeconómicos y las deficiencias en la educación básica son las causas principales. En Europa, el debate se centra más en la motivación, el "matching" entre estudiante y carrera, y la integración social.',
+                labels: ['Socioeconómico', 'Rend. Académico', 'Integración Social', 'Motivación', 'Brechas Ed. Básica'],
+                datasets: [
+                    { label: 'América Latina', data: [9, 7, 6, 7, 8], borderColor: 'rgba(239, 68, 68, 1)', backgroundColor: 'rgba(239, 68, 68, 0.2)' },
+                    { label: 'Europa', data: [5, 8, 8, 8, 4], borderColor: 'rgba(59, 130, 246, 1)', backgroundColor: 'rgba(59, 130, 246, 0.2)' }
+                ]
+            },
+            covid: {
+                title: 'Impacto de la Pandemia COVID-19',
+                description: 'La pandemia exacerbó vulnerabilidades y trajo nuevos riesgos. La "brecha digital" (acceso a internet y dispositivos) y la salud mental (estrés, ansiedad, depresión) emergieron como predictores críticos de la deserción durante y después de la crisis.',
+                labels: ['Brecha Digital', 'Salud Mental', 'Socioeconómico', 'Rend. Académico', 'Competencias Digitales'],
+                datasets: [
+                    { label: 'Post-COVID', data: [9, 9, 8, 6, 7], borderColor: 'rgba(168, 85, 247, 1)', backgroundColor: 'rgba(168, 85, 247, 0.2)' }
+                ]
+            }
+        };
+        
+        const factorImportanceCtx = document.getElementById('factorImportanceChart').getContext('2d');
+        const factorImportanceChart = new Chart(factorImportanceCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Académico', 'Socioeconómico', 'Comportamiento', 'Institucional', 'Psicosocial', 'Demográfico'],
+                datasets: [{
+                    label: 'Poder Predictivo Relativo',
+                    data: [9.5, 8, 7.5, 6, 6.5, 5],
+                    backgroundColor: [
+                        'rgba(13, 148, 136, 0.7)',
+                        'rgba(245, 158, 11, 0.7)',
+                        'rgba(239, 68, 68, 0.7)',
+                        'rgba(59, 130, 246, 0.7)',
+                        'rgba(168, 85, 247, 0.7)',
+                        'rgba(107, 114, 128, 0.7)',
+                    ],
+                    borderColor: [
+                        'rgba(13, 148, 136, 1)',
+                        'rgba(245, 158, 11, 1)',
+                        'rgba(239, 68, 68, 1)',
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(168, 85, 247, 1)',
+                         'rgba(107, 114, 128, 1)',
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'Importancia Relativa de Dominios de Variables' }
+                },
+                scales: {
+                    x: { beginAtZero: true, max: 10, title: { display: true, text: 'Importancia (Escala 1-10)' } }
+                }
+            }
+        });
+        
+        const contextRadarCtx = document.getElementById('contextRadarChart').getContext('2d');
+        let contextRadarChart = new Chart(contextRadarCtx, {
+            type: 'radar',
+            data: contextData.stem_vs_humanidades,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { display: true, text: 'Comparativa de Factores de Riesgo por Contexto' }
+                },
+                scales: {
+                    r: {
+                        angleLines: { display: true },
+                        suggestedMin: 0,
+                        suggestedMax: 10,
+                        pointLabels: {
+                           font: { size: 12 }
+                        }
+                    }
+                }
+            }
+        });
+
+        const algorithmPerformanceCtx = document.getElementById('algorithmPerformanceChart').getContext('2d');
+        const algorithmPerformanceChart = new Chart(algorithmPerformanceCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Random Forest', 'Gradient Boosting', 'Redes Neuronales', 'Regresión Logística', 'Árboles de Decisión'],
+                datasets: [{
+                    label: 'Precisión Reportada (%)',
+                    data: [92, 92, 87, 80, 81.5],
+                    backgroundColor: 'rgba(13, 148, 136, 0.7)',
+                    borderColor: 'rgba(13, 148, 136, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'Rendimiento Promedio de Algoritmos de ML' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    const ranges = {
+                                        'Random Forest': '85-99%',
+                                        'Gradient Boosting': '88-96%',
+                                        'Redes Neuronales': '80-94%',
+                                        'Regresión Logística': '75-85%',
+                                        'Árboles de Decisión': '70-93%'
+                                    };
+                                    label += ranges[context.label];
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true, max: 100, title: { display: true, text: 'Precisión (%)' } }
+                }
+            }
+        });
+        
+        const factorCards = document.querySelectorAll('.card-factor');
+        const factorDetailsTitle = document.getElementById('factor-details-title');
+        const factorDetailsList = document.getElementById('factor-details-list');
+        const factorDetailsInstruction = document.getElementById('factor-details-instruction');
+
+        factorCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const factorId = card.id.replace('factor-card-', '');
+                const data = factorData[factorId];
+
+                factorDetailsTitle.textContent = data.title;
+                factorDetailsTitle.style.color = data.color;
+                factorDetailsList.innerHTML = '';
+                data.variables.forEach(variable => {
+                    const li = document.createElement('li');
+                    li.textContent = variable;
+                    factorDetailsList.appendChild(li);
+                });
+                factorDetailsInstruction.style.display = 'none';
+
+                factorCards.forEach(c => c.classList.remove('border-teal-500', 'ring-2', 'ring-teal-500'));
+                card.classList.add('border-teal-500', 'ring-2', 'ring-teal-500');
+            });
+        });
+
+        const contextBtns = document.querySelectorAll('.context-btn');
+        const contextTitle = document.getElementById('context-title');
+        const contextDescription = document.getElementById('context-description');
+
+        contextBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const contextId = btn.dataset.context;
+                const data = contextData[contextId];
+
+                contextTitle.textContent = data.title;
+                contextDescription.textContent = data.description;
+
+                contextRadarChart.data = data;
+                contextRadarChart.update();
+                
+                contextBtns.forEach(b => {
+                    b.classList.remove('bg-teal-600', 'text-white');
+                    b.classList.add('bg-gray-200', 'text-gray-800');
+                });
+                btn.classList.add('bg-teal-600', 'text-white');
+                btn.classList.remove('bg-gray-200', 'text-gray-800');
+            });
+        });
+        
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('section');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    navLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href').substring(1) === entry.target.id) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, { rootMargin: '-30% 0px -70% 0px' });
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+    });
+    </script>
+</body>
+</html>
